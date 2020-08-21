@@ -44,14 +44,11 @@ pub extern "system" fn driver_entry() -> u32 {
     let process = Process::by_id(4 as _);
     log!("Process found: %i", process.is_some() as u64);
 
-    // Logger
+    // kernel-print
     //
-
-    kernel_print::kernel_println!("BEFORE");
     kernel_print::kernel_dbg!(2 + 2);
-    kernel_print::kernel_println!("{} + {} = {}", 2, 2, 2 + 2);
     kernel_print::kernel_print!("{} + {} = {}\n", 2, 2, 2 + 2);
-    kernel_print::kernel_println!("AFTER");
+    kernel_print::kernel_println!("{} + {} = {}", 2, 2, 2 + 2);
 
     0 /* STATUS_SUCCESS */
 }
