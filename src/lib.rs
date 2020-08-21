@@ -1,8 +1,9 @@
 #![no_std]
+#![feature(alloc_error_handler)]
 
-use crate::include::MmIsAddressValid;
-use crate::process::Process;
-use crate::string::create_unicode_string;
+extern crate alloc;
+
+use crate::{include::MmIsAddressValid, process::Process, string::create_unicode_string};
 use core::panic::PanicInfo;
 
 pub mod include;
@@ -10,15 +11,21 @@ pub mod log;
 pub mod process;
 pub mod string;
 
-/// Explanation can be found here: https://github.com/Trantect/win_driver_example/issues/4
-#[used]
+/// When using the alloc crate it seems like it does some unwinding. Adding this
+/// export satisfies the compiler but may introduce undefined behaviour when a
+/// panic occurs.
 #[no_mangle]
-static _fltused: i32 = 0;
+pub extern "system" fn __CxxFrameHandler3(_: *mut u8, _: *mut u8, _: *mut u8, _: *mut u8) -> i32 { unimplemented!() }
+
+#[global_allocator]
+static GLOBAL: kernel_alloc::KernelAlloc = kernel_alloc::KernelAlloc;
+
+/// Explanation can be found here: https://github.com/Trantect/win_driver_example/issues/4
+#[export_name = "_fltused"]
+static _FLTUSED: i32 = 0;
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
+fn panic(_info: &PanicInfo) -> ! { loop {} }
 
 #[no_mangle]
 pub extern "system" fn driver_entry() -> u32 {
@@ -36,6 +43,15 @@ pub extern "system" fn driver_entry() -> u32 {
     //
     let process = Process::by_id(4 as _);
     log!("Process found: %i", process.is_some() as u64);
+
+    // Logger
+    //
+
+    kernel_print::kernel_println!("BEFORE");
+    kernel_print::kernel_dbg!(2 + 2);
+    kernel_print::kernel_println!("{} + {} = {}", 2, 2, 2 + 2);
+    kernel_print::kernel_print!("{} + {} = {}\n", 2, 2, 2 + 2);
+    kernel_print::kernel_println!("AFTER");
 
     0 /* STATUS_SUCCESS */
 }

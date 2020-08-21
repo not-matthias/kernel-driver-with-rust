@@ -1,6 +1,5 @@
 use crate::include::{ObfDereferenceObject, PsLookupProcessByProcessId};
-use winapi::km::wdm::PEPROCESS;
-use winapi::shared::ntdef::NT_SUCCESS;
+use winapi::{km::wdm::PEPROCESS, shared::ntdef::NT_SUCCESS};
 
 pub struct Process {
     pub process: PEPROCESS,

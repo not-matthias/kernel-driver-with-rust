@@ -1,12 +1,12 @@
-use failure::format_err;
-use failure::Error;
+use failure::{format_err, Error};
 use std::{
     env::var,
     path::{Path, PathBuf},
 };
 use winreg::{enums::*, RegKey};
 
-/// Returns the path to the `Windows Kits` directory. It's by default at `C:\Program Files (x86)\Windows Kits\10`.
+/// Returns the path to the `Windows Kits` directory. It's by default at
+/// `C:\Program Files (x86)\Windows Kits\10`.
 fn get_windows_kits_dir() -> Result<PathBuf, Error> {
     let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
     let key = r"SOFTWARE\Microsoft\Windows Kits\Installed Roots";
@@ -15,7 +15,8 @@ fn get_windows_kits_dir() -> Result<PathBuf, Error> {
     Ok(dir.into())
 }
 
-/// Returns the path to the kernel mode libraries. The path may look like this: `C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\km`.
+/// Returns the path to the kernel mode libraries. The path may look like this:
+/// `C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\km`.
 fn get_km_dir(windows_kits_dir: &PathBuf) -> Result<PathBuf, Error> {
     let readdir = Path::new(windows_kits_dir).join("lib").read_dir()?;
 
@@ -49,21 +50,13 @@ fn internal_link_search() {
     };
 
     let lib_dir = km_dir.join(arch);
-    println!(
-        "cargo:rustc-link-search=native={}",
-        lib_dir.to_str().unwrap()
-    );
+    println!("cargo:rustc-link-search=native={}", lib_dir.to_str().unwrap());
 }
 
 fn extra_link_search() {}
 
 fn main() {
-    if var(format!(
-        "CARGO_FEATURE_{}",
-        "extra_link_search".to_uppercase()
-    ))
-    .is_ok()
-    {
+    if var(format!("CARGO_FEATURE_{}", "extra_link_search".to_uppercase())).is_ok() {
         extra_link_search()
     } else {
         internal_link_search()

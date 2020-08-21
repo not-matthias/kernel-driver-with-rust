@@ -11,6 +11,7 @@ script = [
 ]
 
 [tasks.rename]
+dependencies = ["build-driver"]
 ignore_errors = true
 script = [
     "cd %TARGET_PATH%",
