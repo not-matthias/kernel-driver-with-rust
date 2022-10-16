@@ -3,16 +3,18 @@ name = "driver"
 version = "0.1.0"
 authors = ["not-matthias <26800596+not-matthias@users.noreply.github.com>"]
 edition = "2018"
-build = "build.rs"
 
 [lib]
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-kernel-print = "0.1.0"
-kernel-alloc = "0.1.0"
-obfstr = "0.1.1"
+kernel-log = "0.1.2"
+kernel-alloc = "0.1.2"
+kernel-build = "0.1.0"
+obfstr = "0.4.1"
+
+ntapi = { version = "0.4.0", default-features = false, features = ["kernel"] }
 
 [dependencies.winapi]
 git = "https://github.com/Trantect/winapi-rs.git"
@@ -21,7 +23,3 @@ features = [
     "wdm",
     "ntstatus",
 ]
-
-[build-dependencies]
-winreg = "0.7.0"
-failure = "0.1.8"
